@@ -12,19 +12,11 @@ def find_post(id: int):
         if i['id'] == id:
             return i
 
-class Post(BaseModel): #Validates/Checks if the title and content are String dataType if not it will throw an error 
+class Post(BaseModel):  #Validates every field in the Class, and tries to convert first, if the conversion to a set datatype fails it will errors.
     title: str
     content: str
     published: bool = True #if left empty it will default to True. (optional field)
-    rating: int | None = None # XOR operation. only takes an int or nothing.
-
-@app.get("/")
-async def root():
-    return {"message": "Hello, World!!!"}
-
-@app.get("/posts")
-def get_posts():
-    return {"data": my_posts}
+    rating: int | None = None # # Optional field, accepts an int or None (Union type)
 
 @app.post("/posts")
 def create_posts(post: Post):
@@ -33,8 +25,24 @@ def create_posts(post: Post):
     my_posts.append(post_dict)
     return {"data": post_dict} # send back the brand new post that we added to our posts.
 
+
+
+@app.get("/")
+async def root():
+    return {"message": "Hello, World!"}
+
+@app.get("/posts")
+def get_posts():
+    return {"data": my_posts}
+
+
 @app.get("/posts/{id}") #{id} = path parameter.
 def get_post(id: int):
     post = find_post(id)
     return {"post_details": post}
     
+
+@app.put("/posts/{id}")
+
+
+@app.delete("/posts/{id}")
