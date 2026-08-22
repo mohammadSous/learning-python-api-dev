@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, status
 from pydantic import BaseModel
 from random import randrange
 
@@ -54,7 +54,6 @@ def get_post(id: int):
 
 @app.put("/posts/{id}")
 def update_post(id: int, post: Post):
-    post_dict = post.model_dump()
     """
     Update (fully replace) an existing post.
 
@@ -70,18 +69,19 @@ def update_post(id: int, post: Post):
     Raises:
         HTTPException: 404 if no post with the given id exists.
     """
+    post_dict = post.model_dump()
     index = get_post_index(id)
     if index is None:
-        raise HTTPException(status_code=404, detail = f"post with id: {id} does not exist")
+        raise HTTPException(status_code=404, detail=f"post with id: {id} does not exist")
     post_dict['id'] = id
     my_posts[index] = post_dict
     return {"data": post_dict}
 
 
-@app.delete("/posts/{id}")
-def delete_post():
+@app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_post(id: int):
     index = get_post_index(id)
     if index is None:
-        raise HTTPException(status_code=404, detail=f"post with id: {id} does not exist.")
+        raise HTTPException(status_code=404, detail= f"post with id: {id} does not exist.")
     my_posts.pop(index)
     return
