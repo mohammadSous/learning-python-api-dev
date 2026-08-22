@@ -47,8 +47,8 @@ def get_latest_post():
 @app.get("/posts/{id}") #{id} = path parameter.
 def get_post(id: int):
     post = find_post(id)
-    if not post: # clinet supplies an id, if it doesn't exist > error 404. (post not found)
-        raise HTTPException(status_code = 404, detail = f"post with id: {id} was not found")
+    if not post: # clinet supplies an id, if it doesn't exist => error 404. (post not found)
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"post with id: {id} was not found")
     return {"post_details": post}
     
 
@@ -72,7 +72,7 @@ def update_post(id: int, post: Post):
     post_dict = post.model_dump()
     index = get_post_index(id)
     if index is None:
-        raise HTTPException(status_code=404, detail=f"post with id: {id} does not exist")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
     post_dict['id'] = id
     my_posts[index] = post_dict
     return {"data": post_dict}
@@ -82,6 +82,6 @@ def update_post(id: int, post: Post):
 def delete_post(id: int):
     index = get_post_index(id)
     if index is None:
-        raise HTTPException(status_code=404, detail= f"post with id: {id} does not exist.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail= f"post with id: {id} does not exist.")
     my_posts.pop(index)
     return
