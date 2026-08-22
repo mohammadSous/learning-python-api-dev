@@ -12,7 +12,7 @@ def find_post(id: int): #returns the post by it ID
         if i['id'] == id:
             return i
         
-def find_post_index(id: int): #returns the post index by it ID
+def get_post_index(id: int): #returns the post index by it ID
     for i, p in enumerate(my_posts):
         if p['id'] == id:
             return i
@@ -70,7 +70,7 @@ def update_post(id: int, post: Post):
     Raises:
         HTTPException: 404 if no post with the given id exists.
     """
-    index = get_post(id)
+    index = get_post_index(id)
     if index is None:
         raise HTTPException(status_code=404, detail = f"post with id: {id} does not exist")
     post_dict['id'] = id
@@ -80,7 +80,7 @@ def update_post(id: int, post: Post):
 
 @app.delete("/posts/{id}")
 def delete_post():
-    index = get_post(id)
+    index = get_post_index(id)
     if index is None:
         raise HTTPException(status_code=404, detail=f"post with id: {id} does not exist.")
     my_posts.pop(index)
