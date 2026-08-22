@@ -7,9 +7,14 @@ app = FastAPI()
 my_posts = [{"title": "title of post 1", "content": "content of post 1", "id": 1}, 
             {"title": "fav foods", "content": "i like pizza", "id": 2}]
 
-def find_post(id: int):
+def find_post(id: int): #returns the post by it ID
     for i in my_posts:
         if i['id'] == id:
+            return i
+        
+def find_post_index(id: int): #returns the post index by it ID
+    for i, p in enumerate(my_posts):
+        if p['id'] == id:
             return i
 
 class Post(BaseModel):  #Validates every field in the Class, and tries to convert first, if the conversion to a set datatype fails it will errors.
