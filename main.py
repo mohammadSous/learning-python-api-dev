@@ -23,7 +23,7 @@ class Post(BaseModel):  #Validates every field in the Class, and tries to conver
     published: bool = True #if left empty it will default to True. (optional field)
     rating: int | None = None # # Optional field, accepts an int or None (Union type)
 
-@app.post("/posts")
+@app.post("/posts", status_code = status.HTTP_201_CREATED)
 def create_posts(post: Post):
     post_dict = post.model_dump() # model dump turns a pydantic model into a dict.
     post_dict['id'] = randrange(0, 1000000)
