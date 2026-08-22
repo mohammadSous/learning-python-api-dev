@@ -40,9 +40,17 @@ def get_posts():
 def get_post(id: int):
     post = find_post(id)
     return {"post_details": post}
+
+@app.get("/posts/latest")
+def get_latest_post():
+    return {"detail": my_posts[-1]}
     
 
 @app.put("/posts/{id}")
+def update_post():
+    pass
 
 
 @app.delete("/posts/{id}")
+def delete_post():
+    pass
