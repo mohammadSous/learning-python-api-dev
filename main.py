@@ -75,4 +75,8 @@ def update_post(id: int, post: Post):
 
 @app.delete("/posts/{id}")
 def delete_post():
-    pass
+    index = get_post(id)
+    if index is None:
+        raise HTTPException(status_code=404, detail=f"post with id: {id} does not exist.")
+    my_posts.pop(index)
+    return
