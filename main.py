@@ -48,8 +48,29 @@ def get_post(id: int):
     
 
 @app.put("/posts/{id}")
-def update_post():
-    pass
+def update_post(id: int, post: Post):
+    post_dict = post.model_dump()
+    """
+    Update (fully replace) an existing post.
+
+    Arguments:
+        id (int): The id of the post to update, taken from the URL path.
+        post (Post): The new post data, taken from the request body.
+                     All required fields (title, content) must be included,
+                     since this replaces the entire post, not just part of it.
+
+    Returns:
+        dict: A dict containing the updated post under the key "data".
+
+    Raises:
+        HTTPException: 404 if no post with the given id exists.
+    """
+    index = get_post(id)
+    if index is None:
+        raise HTTPException(status_code=404, detail = f"post with id: {id} does not exist")
+    post_dict['id'] = id
+    my_posts[index] = post_dict
+    return {"data": post_dict}
 
 
 @app.delete("/posts/{id}")
