@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from random import randrange
 
@@ -42,6 +42,8 @@ def get_latest_post():
 @app.get("/posts/{id}") #{id} = path parameter.
 def get_post(id: int):
     post = find_post(id)
+    if not post: # clinet supplies an id, if it doesn't exist > error 404. (post not found)
+        raise HTTPException(status_code = 404, detail = f"post with id: {id} was not found")
     return {"post_details": post}
     
 
