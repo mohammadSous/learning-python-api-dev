@@ -35,15 +35,14 @@ async def root():
 def get_posts():
     return {"data": my_posts}
 
+@app.get("/posts/latest")
+def get_latest_post():
+    return {"detail": my_posts[-1]}
 
 @app.get("/posts/{id}") #{id} = path parameter.
 def get_post(id: int):
     post = find_post(id)
     return {"post_details": post}
-
-@app.get("/posts/latest")
-def get_latest_post():
-    return {"detail": my_posts[-1]}
     
 
 @app.put("/posts/{id}")
