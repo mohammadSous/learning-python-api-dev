@@ -58,13 +58,13 @@ def get_posts():
     posts = cursor.fetchall() # retrive all posts.
     return {"data": posts}
 
-@app.get("/posts/latest")
-def get_latest_post():
-    return {"detail": my_posts[-1]}
+# @app.get("/posts/latest")
+# def get_latest_post():
+#     return {"detail": my_posts[-1]}
 
 @app.get("/posts/{id}") #{id} = path parameter.
 def get_post(id: int):
-    cursor.execute("""SELECT * FROM posts where id = %s""",(id))
+    cursor.execute("""SELECT * FROM posts WHERE id = %s;""",(str(id),))
     post = cursor.fetchone()
     print(post)
     if not post: # clinet supplies an id, if it doesn't exist => error 404. (post not found)
