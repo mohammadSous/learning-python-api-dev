@@ -4,7 +4,17 @@ from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
+from . import models
+from .database import engine
 
+models.Base.metadata.create_all(bind=engine)
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 app = FastAPI()
 
@@ -27,6 +37,10 @@ class Post(BaseModel):  #Validates every field in the Class, and tries to conver
     published: bool = True #if left empty it will default to True. (optional field)
     #rating: int | None = None # # Optional field, accepts an int or None (Union type)
 
+class PostUpdate(BaseModel):
+    title: str | None = None
+    content: str | None = None
+    published: bool | None = None
 while True:
     try:
         conn = psycopg2.connect(host = 'localhost', database = 'fastapi_project', user = 'postgres', password = 'postgres', cursor_factory=RealDictCursor)
@@ -72,15 +86,20 @@ def get_post(id: int):
     return {"post_details": post}
     
 
-@app.put("/posts/{id}")
-def update_post(id: int, post: Post):
-    post_dict = post.model_dump()
-    index = get_post_index(id)
-    if index is None:
+@app.patch("/posts/{id}")
+def update_post(id: int, post: PostUpdate):
+    cursor.execute("""
+        UPDATE posts
+        SET title = COALESCE(%s, title),
+            content = COALESCE(%s, content),
+            published = COALESCE(%s, published)
+        WHERE id = %s RETURNING *
+        """, (post.title, post.content, post.published, str(id),))
+    updated_post = cursor.fetchone()
+    conn.commit()
+    if updated_post is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
-    post_dict['id'] = id
-    my_posts[index] = post_dict
-    return {"data": post_dict}
+    return {"data": updated_post}
 
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
