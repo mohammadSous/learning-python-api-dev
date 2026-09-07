@@ -1,11 +1,12 @@
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, status, Depends
 from pydantic import BaseModel
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
+from sqlalchemy.orm import Session
 from . import models
-from .database import engine
+from .database import engine, SessionLocal
 
 models.Base.metadata.create_all(bind=engine)
 
