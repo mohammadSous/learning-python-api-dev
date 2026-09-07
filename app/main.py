@@ -55,8 +55,7 @@ async def root():
 def get_posts():
     cursor.execute("""SELECT * FROM posts """) # runs the SQL command.
     posts = cursor.fetchall() # retrive all posts.
-    print(posts)
-    return {"data": my_posts}
+    return {"data": posts}
 
 @app.get("/posts/latest")
 def get_latest_post():
