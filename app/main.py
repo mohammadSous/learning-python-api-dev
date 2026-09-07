@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import time
 
 
 app = FastAPI()
@@ -26,13 +27,16 @@ class Post(BaseModel):  #Validates every field in the Class, and tries to conver
     published: bool = True #if left empty it will default to True. (optional field)
     #rating: int | None = None # # Optional field, accepts an int or None (Union type)
 
-try:
-    conn = psycopg2.connect(host = 'localhost', database = 'fastapi_project', user = 'postgres', password = 'postgres', cursor_factory=RealDictCursor)
-    cursor = conn.cursor()
-    print("Database connection was successful.")
-except Exception as error:
-    print("connection to database failed.")
-    print(f"Error: {error}")
+while True:
+    try:
+        conn = psycopg2.connect(host = 'localhost', database = 'fastapi_project', user = 'postgres', password = 'postgres', cursor_factory=RealDictCursor)
+        cursor = conn.cursor()
+        print("Database connection was successful.")
+        break
+    except Exception as error:
+        print("connection to database failed.")
+        print(f"Error: {error}")
+        time.sleep(2)
 
 @app.post("/posts", status_code = status.HTTP_201_CREATED)
 def create_posts(post: Post):
@@ -49,6 +53,9 @@ async def root():
 
 @app.get("/posts")
 def get_posts():
+    cursor.execute("""SELECT * FROM posts """) # runs the SQL command.
+    posts = cursor.fetchall() # retrive all posts.
+    print(posts)
     return {"data": my_posts}
 
 @app.get("/posts/latest")
