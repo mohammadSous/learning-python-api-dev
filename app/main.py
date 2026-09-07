@@ -10,13 +10,6 @@ from .database import engine, SessionLocal
 
 models.Base.metadata.create_all(bind=engine)
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
 app = FastAPI()
 
 # my_posts = [{"title": "title of post 1", "content": "content of post 1", "id": 1}, 
@@ -66,6 +59,10 @@ def create_posts(post: Post): #pydantic
 @app.get("/")
 async def root():
     return {"message": "Hello, World!"}
+
+@app.get("/sqlalchemy")
+def test_posts(db: Session = Depends(get_db)):
+    return {"status": "success"}
 
 @app.get("/posts")
 def get_posts():
