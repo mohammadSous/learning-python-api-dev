@@ -74,21 +74,6 @@ def get_post(id: int):
 
 @app.put("/posts/{id}")
 def update_post(id: int, post: Post):
-    """
-    Update (fully replace) an existing post.
-
-    Arguments:
-        id (int): The id of the post to update, taken from the URL path.
-        post (Post): The new post data, taken from the request body.
-                     All required fields (title, content) must be included,
-                     since this replaces the entire post, not just part of it.
-
-    Returns:
-        dict: A dict containing the updated post under the key "data".
-
-    Raises:
-        HTTPException: 404 if no post with the given id exists.
-    """
     post_dict = post.model_dump()
     index = get_post_index(id)
     if index is None:
