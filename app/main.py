@@ -42,9 +42,10 @@ while True:
 
 @app.post("/posts", status_code = status.HTTP_201_CREATED)
 def create_posts(post: Post): #pydantic
-    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING""",
+    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *;""",
                    (post.title, post.content, post.published)) #SQL injection proof.
-    new_post = cursor.fetchone() 
+    new_post = cursor.fetchone()
+    conn.commit() # Save it to the database.
     return {"data": new_post} # send back the brand new post that we added to our posts.
 
 @app.get("/")
@@ -53,7 +54,7 @@ async def root():
 
 @app.get("/posts")
 def get_posts():
-    cursor.execute("""SELECT * FROM posts """) # runs the SQL command.
+    cursor.execute("""SELECT * FROM posts;""") # runs the SQL command.
     posts = cursor.fetchall() # retrive all posts.
     return {"data": posts}
 
@@ -63,7 +64,9 @@ def get_latest_post():
 
 @app.get("/posts/{id}") #{id} = path parameter.
 def get_post(id: int):
-    post = find_post(id)
+    cursor.execute("""SELECT * FROM posts where id = %s""",(id))
+    post = cursor.fetchone()
+    print(post)
     if not post: # clinet supplies an id, if it doesn't exist => error 404. (post not found)
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"post with id: {id} was not found")
     return {"post_details": post}
