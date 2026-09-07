@@ -38,14 +38,14 @@ while True:
         print(f"Error: {error}")
         time.sleep(2)
 
+
+
 @app.post("/posts", status_code = status.HTTP_201_CREATED)
-def create_posts(post: Post):
-    post_dict = post.model_dump() # model dump turns a pydantic model into a dict.
-    post_dict['id'] = randrange(0, 1000000)
-    my_posts.append(post_dict)
-    return {"data": post_dict} # send back the brand new post that we added to our posts.
-
-
+def create_posts(post: Post): #pydantic
+    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING""",
+                   (post.title, post.content, post.published)) #SQL injection proof.
+    new_post = cursor.fetchone() 
+    return {"data": new_post} # send back the brand new post that we added to our posts.
 
 @app.get("/")
 async def root():
