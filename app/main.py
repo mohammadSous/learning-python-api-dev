@@ -4,13 +4,6 @@ from random import randrange
 import psycopg2
 from psycopg2.extras import RealDictCursor
 
-try:
-    conn = psycopg2.connect(host = 'localhost', database = 'fastapi_project', user = 'postgres', password = 'postgres', cursor_factory=RealDictCursor)
-    cursor = conn.cursor()
-    print("Database connection was successful.")
-except Exception as error:
-    print("connection to database failed.")
-    print(f"Error: {error}")
 
 app = FastAPI()
 
@@ -32,6 +25,14 @@ class Post(BaseModel):  #Validates every field in the Class, and tries to conver
     content: str
     published: bool = True #if left empty it will default to True. (optional field)
     #rating: int | None = None # # Optional field, accepts an int or None (Union type)
+
+try:
+    conn = psycopg2.connect(host = 'localhost', database = 'fastapi_project', user = 'postgres', password = 'postgres', cursor_factory=RealDictCursor)
+    cursor = conn.cursor()
+    print("Database connection was successful.")
+except Exception as error:
+    print("connection to database failed.")
+    print(f"Error: {error}")
 
 @app.post("/posts", status_code = status.HTTP_201_CREATED)
 def create_posts(post: Post):
