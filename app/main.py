@@ -21,7 +21,7 @@ class Post(BaseModel):  #Validates every field in the Class, and tries to conver
     title: str
     content: str
     published: bool = True #if left empty it will default to True. (optional field)
-    rating: int | None = None # # Optional field, accepts an int or None (Union type)
+    #rating: int | None = None # # Optional field, accepts an int or None (Union type)
 
 @app.post("/posts", status_code = status.HTTP_201_CREATED)
 def create_posts(post: Post):
