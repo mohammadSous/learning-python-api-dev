@@ -26,13 +26,13 @@ class PostUpdate(BaseModel):
 
 
 
-@app.post("/posts", status_code = status.HTTP_201_CREATED)
-def create_posts(post: Post): #pydantic
-    cursor.execute("""INSERT INTO posts (title, content, published) VALUES (%s, %s, %s) RETURNING *;""",
-                   (post.title, post.content, post.published)) #SQL injection proof.
-    new_post = cursor.fetchone()
-    conn.commit() # Save it to the database.
-    return {"data": new_post} # send back the brand new post that we added to our posts.
+@app.post("/posts", status_code=status.HTTP_201_CREATED)
+def create_posts(post: Post, db: Session = Depends(get_db)):
+    new_post = models.Post(**post.model_dump())
+    db.add(new_post)
+    db.commit()
+    db.refresh(new_post)
+    return {"data": new_post}
 
 
 @app.get("/")
@@ -46,10 +46,9 @@ def test_posts(db: Session = Depends(get_db)):
     return {"data": posts}
 
 
-@app.get("/posts")
-def get_posts():
-    cursor.execute("""SELECT * FROM posts;""") # runs the SQL command.
-    posts = cursor.fetchall() # retrive all posts.
+@app.get("/posts") # GETS all posts
+def get_posts(db: Session = Depends(get_db)):
+    posts = db.query(models.Post).all() #grabs all entries from our posts table, same as SELECT * FROM posts;
     return {"data": posts}
 
 
@@ -58,38 +57,38 @@ def get_posts():
 #     return {"detail": my_posts[-1]}
 
 @app.get("/posts/{id}") #{id} = path parameter.
-def get_post(id: int):
-    cursor.execute("""SELECT * FROM posts WHERE id = %s;""",(str(id),))
-    post = cursor.fetchone()
-    print(post)
+def get_post(id: int, db: Session = Depends(get_db)):
+    post = db.query(models.Post).filter(models.Post.id == id).first()
     if not post: # clinet supplies an id, if it doesn't exist => error 404. (post not found)
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"post with id: {id} was not found")
     return {"post_details": post}
     
 
 @app.patch("/posts/{id}")
-def update_post(id: int, post: PostUpdate):
-    cursor.execute("""
-        UPDATE posts
-        SET title = COALESCE(%s, title),
-            content = COALESCE(%s, content),
-            published = COALESCE(%s, published)
-        WHERE id = %s RETURNING *
-        """, (post.title, post.content, post.published, str(id),))
-    updated_post = cursor.fetchone()
-    conn.commit()
-    if updated_post is None:
+def update_post(id: int, post: PostUpdate, db: Session = Depends(get_db)):
+    post_query = db.query(models.Post).filter(models.Post.id == id)  # grabs the post by it id, but does nothing yet.
+    existing_post = post_query.first()  # runs the query once to check if the post exist or not.
+
+    if existing_post is None:  # same 404 check.
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
-    return {"data": updated_post}
+
+    post_query.update(post.model_dump(exclude_unset=True), synchronize_session=False)
+    # .update() runs the actual UPDATE on whatever post_query's WHERE clause matches
+    # post.model_dump(exclude_unset=True) = only the fields the client actually sent, as a dict
+    # synchronize_session=False = required for bulk .update(), skips SQLAlchemy's normal object-syncing
+
+    db.commit()  # same role as conn.commit() nothing saves until this runs
+
+    return {"data": post_query.first()}  # re-run the query to return the UPDATED row, not the stale one
 
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int):
-    cursor.execute("""DELETE FROM posts WHERE id = %s RETURNING *;""", (str(id),))
-    deleted_post = cursor.fetchone()
-    conn.commit()
-
-    if deleted_post is None:
+def delete_post(id: int, db: Session = Depends(get_db)):
+    post_query = db.query(models.Post).filter(models.Post.id == id) # fetch
+    existing_post = post_query.first() # check if it exists
+    if existing_post is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist.")
+    post_query.delete(synchronize_session=False) # delete it 
+    db.commit() # save it
 
     return
