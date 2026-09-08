@@ -12,18 +12,6 @@ models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
-# my_posts = [{"title": "title of post 1", "content": "content of post 1", "id": 1}, 
-#             {"title": "fav foods", "content": "i like pizza", "id": 2}]
-
-# def find_post(id: int): #returns the post by it ID
-#     for i in my_posts:
-#         if i['id'] == id:
-#             return i
-        
-# def get_post_index(id: int): #returns the post index by it ID
-#     for i, p in enumerate(my_posts):
-#         if p['id'] == id:
-#             return i
 
 class Post(BaseModel):  #Validates every field in the Class, and tries to convert first, if the conversion to a set datatype fails it will errors.
     title: str
@@ -35,16 +23,6 @@ class PostUpdate(BaseModel):
     title: str | None = None
     content: str | None = None
     published: bool | None = None
-while True:
-    try:
-        conn = psycopg2.connect(host = 'localhost', database = 'fastapi_project', user = 'postgres', password = 'postgres', cursor_factory=RealDictCursor)
-        cursor = conn.cursor()
-        print("Database connection was successful.")
-        break
-    except Exception as error:
-        print("connection to database failed.")
-        print(f"Error: {error}")
-        time.sleep(2)
 
 
 
@@ -56,19 +34,24 @@ def create_posts(post: Post): #pydantic
     conn.commit() # Save it to the database.
     return {"data": new_post} # send back the brand new post that we added to our posts.
 
+
 @app.get("/")
 async def root():
     return {"message": "Hello, World!"}
 
+
 @app.get("/sqlalchemy")
 def test_posts(db: Session = Depends(get_db)):
-    return {"status": "success"}
+    posts = db.query(models.Post).all() #grabs all entries from our posts table, same as SELECT * FROM posts;
+    return {"data": posts}
+
 
 @app.get("/posts")
 def get_posts():
     cursor.execute("""SELECT * FROM posts;""") # runs the SQL command.
     posts = cursor.fetchall() # retrive all posts.
     return {"data": posts}
+
 
 # @app.get("/posts/latest")
 # def get_latest_post():
