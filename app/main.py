@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from . import models, schemas
 from .database import engine, get_db
+from typing import List
+
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -24,7 +26,7 @@ async def root():
     return {"message": "Hello, World!"}
 
 
-@app.get("/posts") # GETS all posts
+@app.get("/posts", response_model=List[schemas.Post]) # GETS all posts
 def get_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all() #grabs all entries from our posts table, same as SELECT * FROM posts;
     return posts
@@ -35,7 +37,7 @@ def get_posts(db: Session = Depends(get_db)):
 #     return {"detail": my_posts[-1]}
 
 
-@app.get("/posts/{id}") #{id} = path parameter.
+@app.get("/posts/{id}", response_model= schemas.Post) #{id} = path parameter.
 def get_post(id: int, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == id).first()
     if not post: # clinet supplies an id, if it doesn't exist => error 404. (post not found)
@@ -43,7 +45,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
     return post
 
 
-@app.patch("/posts/{id}")
+@app.patch("/posts/{id}", response_model= schemas.Post)
 def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(get_db)):
     post_query = db.query(models.Post).filter(models.Post.id == id)  # grabs the post by it id, but does nothing yet.
     existing_post = post_query.first()  # runs the query once to check if the post exist or not.
