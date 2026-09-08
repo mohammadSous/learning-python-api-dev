@@ -24,9 +24,17 @@ class PostUpdate(BaseModel):
     content: str | None = None
     published: bool | None = None
 
+class Post(BaseModel):
+    title: str
+    content: str
+    published: bool
+
+    class Config:
+        orm_mode = True
 
 
-@app.post("/posts", status_code=status.HTTP_201_CREATED)
+
+@app.post("/posts", status_code=status.HTTP_201_CREATED, response_model= schemas.Post)
 def create_posts(post: Post, db: Session = Depends(get_db)):
     new_post = models.Post(**post.model_dump()) #pydantic.
     db.add(new_post)
