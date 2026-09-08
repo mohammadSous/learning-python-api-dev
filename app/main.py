@@ -11,7 +11,7 @@ app = FastAPI()
 
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED, response_model= schemas.Post)
-def create_posts(post: schemas.Post, db: Session = Depends(get_db)):
+def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db)):
     new_post = models.Post(**post.model_dump()) #pydantic.
     db.add(new_post)
     db.commit()

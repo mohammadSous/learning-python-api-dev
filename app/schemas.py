@@ -11,10 +11,9 @@ class PostBase(BaseModel):  #Validates every field in the Class, and tries to co
 class PostCreate(PostBase):
     pass
 
-class Post(BaseModel):
-    title: str
-    content: str
-    published: bool
+class Post(PostBase): # <<-- this is a response schema.
+    id: int
+    created_at: datetime
 
     class Config:
         orm_mode = True
