@@ -28,11 +28,11 @@ class PostUpdate(BaseModel):
 
 @app.post("/posts", status_code=status.HTTP_201_CREATED)
 def create_posts(post: Post, db: Session = Depends(get_db)):
-    new_post = models.Post(**post.model_dump())
+    new_post = models.Post(**post.model_dump()) #pydantic.
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
-    return {"data": new_post}
+    return new_post
 
 
 @app.get("/")
@@ -49,7 +49,7 @@ def test_posts(db: Session = Depends(get_db)):
 @app.get("/posts") # GETS all posts
 def get_posts(db: Session = Depends(get_db)):
     posts = db.query(models.Post).all() #grabs all entries from our posts table, same as SELECT * FROM posts;
-    return {"data": posts}
+    return posts
 
 
 # @app.get("/posts/latest")
@@ -61,7 +61,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
     post = db.query(models.Post).filter(models.Post.id == id).first()
     if not post: # clinet supplies an id, if it doesn't exist => error 404. (post not found)
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"post with id: {id} was not found")
-    return {"post_details": post}
+    return post
     
 
 @app.patch("/posts/{id}")
@@ -79,7 +79,7 @@ def update_post(id: int, post: PostUpdate, db: Session = Depends(get_db)):
 
     db.commit()  # same role as conn.commit() nothing saves until this runs
 
-    return {"data": post_query.first()}  # re-run the query to return the UPDATED row, not the stale one
+    return post_query.first() # re-run the query to return the UPDATED row, not the stale one
 
 
 @app.delete("/posts/{id}", status_code=status.HTTP_204_NO_CONTENT)
