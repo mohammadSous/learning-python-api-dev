@@ -20,3 +20,11 @@ class Post(PostBase): # <<-- this is a response schema.
 class UserCreate(BaseModel):
     email: EmailStr
     password: str
+
+class UserOut(BaseModel): # <-- Response model for users. SO it doesn't return the password.
+    id: int
+    email: EmailStr
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
