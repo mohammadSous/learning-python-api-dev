@@ -5,7 +5,7 @@ from ..database import get_db
 from typing import List
 
 
-router = APIRouter(prefix= "/posts")
+router = APIRouter(prefix= "/posts", tags= ["Posts"])
 
 
 @router.post("/", status_code=status.HTTP_201_CREATED, response_model= schemas.Post)
