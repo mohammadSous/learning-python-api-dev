@@ -73,3 +73,12 @@ def delete_post(id: int, db: Session = Depends(get_db)):
     db.commit() # save it
 
     return
+
+
+@app.post("/users", status_code=status.HTTP_201_CREATED)
+def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
+    new_user = models.User(**user.model_dump())
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
