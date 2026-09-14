@@ -28,3 +28,7 @@ class UserOut(BaseModel): # <-- Response model for users. SO it doesn't return t
 
     class Config:
         orm_mode = True
+
+class UserLogin(BaseModel):
+    email: EmailStr
+    password: str
