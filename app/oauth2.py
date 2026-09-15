@@ -1,6 +1,6 @@
 import jwt
 from jwt.exceptions import InvalidTokenError
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from . import schemas
 from fastapi import Depends, status, HTTPException
 from fastapi.security import OAuth2PasswordBearer
@@ -13,12 +13,12 @@ ouath2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
 SECRET_KEY = "986395efcee6f1c3fdaec5ebe3b7548a66ef812cd7cf2d4febb892efe5ffa9e4"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 1
 
 def create_access_token(data: dict): # <<-- this happens after a successful login using POST /login
     to_encode = data.copy() # takes the entred data which is the user id.
 
-    expire = datetime.now() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire}) # adds expire to the dict (to_encode)
 
     encoded_jwt = jwt.encode(to_encode,SECRET_KEY, algorithm=ALGORITHM) # jwt method that takes the payload, key (secret), and the algorithm.
