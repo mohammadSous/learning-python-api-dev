@@ -37,7 +37,7 @@ def get_post(id: int, db: Session = Depends(get_db)):
 
 
 @router.patch("/{id}", response_model= schemas.Post)
-def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(get_db)):
+def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(get_db), current_user: schemas.TokenData = Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == id)  # grabs the post by it id, but does nothing yet.
     existing_post = post_query.first()  # runs the query once to check if the post exist or not.
 
@@ -55,7 +55,7 @@ def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(get_db)
 
 
 @router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db)):
+def delete_post(id: int, db: Session = Depends(get_db), current_user: schemas.TokenData = Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.id == id) # fetch
     existing_post = post_query.first() # check if it exists
     if existing_post is None:
