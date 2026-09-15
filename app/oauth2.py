@@ -28,12 +28,12 @@ def create_access_token(data: dict): # <<-- this happens after a successful logi
 
 def verify_access_token(token: str, credentials_exception):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        id: str = payload.get("user_id")
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM]) # example: payload = {"user_id": 5, "exp": 1234567890
+        id: str = payload.get("user_id") # example:  id = 5 (integer)
 
         if id is None:
             raise credentials_exception
-        token_data = schemas.TokenData(id=id)
+        token_data = schemas.TokenData(id=id) # assigns it to token_data. Pydantic validates the shape the moment it's constructed
     except InvalidTokenError:
         raise credentials_exception
 
