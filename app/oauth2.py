@@ -13,7 +13,7 @@ ouath2_scheme = OAuth2PasswordBearer(tokenUrl='login')
 
 SECRET_KEY = "986395efcee6f1c3fdaec5ebe3b7548a66ef812cd7cf2d4febb892efe5ffa9e4"
 ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 1
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 def create_access_token(data: dict): # <<-- this happens after a successful login using POST /login
     to_encode = data.copy() # takes the entred data which is the user id.
