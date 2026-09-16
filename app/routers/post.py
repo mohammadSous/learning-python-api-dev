@@ -43,6 +43,9 @@ def update_post(id: int, post: schemas.PostCreate, db: Session = Depends(get_db)
 
     if existing_post is None:  # same 404 check.
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist")
+    
+    if existing_post.owner_id != current_user.id: # check posts/DELETE for if statement details.
+        raise HTTPException(status_code= status.HTTP_403_FORBIDDEN, detail= "Not Autharized to Perfom Request Action.")
 
     post_query.update(post.model_dump(exclude_unset=True), synchronize_session=False)
     # .update() runs the actual UPDATE on whatever post_query's WHERE clause matches
@@ -60,6 +63,10 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user: schemas.To
     existing_post = post_query.first() # check if it exists
     if existing_post is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} does not exist.")
+    
+    if existing_post.owner_id != current_user.id: # Check if the user who is attempting to delete this existing post have the same id (owner id) of the person who published that post!
+        raise HTTPException(status_code= status.HTTP_403_FORBIDDEN, detail= "Not Autharized to Perfom Request Action.")
+
     post_query.delete(synchronize_session=False) # delete it 
     db.commit() # save it
 
