@@ -11,6 +11,7 @@ class PostCreate(PostBase):
     pass
 
 class Post(PostBase): # <<-- this is a response schema.
+    id: int
     created_at: datetime
     owner_id: int
 
