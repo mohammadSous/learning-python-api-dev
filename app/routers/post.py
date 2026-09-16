@@ -17,9 +17,9 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), curren
     return new_post
 
 
-@router.get("/")
-async def root():
-    return {"message": "Hello, World!"}
+# @router.get("/")
+# async def root():
+#     return {"message": "Hello, World!"}
 
 
 @router.get("/", response_model=List[schemas.Post]) # GETS all posts
