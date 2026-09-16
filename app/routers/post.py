@@ -22,9 +22,9 @@ def create_posts(post: schemas.PostCreate, db: Session = Depends(get_db), curren
 #     return {"message": "Hello, World!"}
 
 
-@router.get("/", response_model=List[schemas.Post]) # GETS all posts
-def get_posts(db: Session = Depends(get_db), limit: int = 10):
-    posts = db.query(models.Post).all() #grabs all entries from our posts table, same as SELECT * FROM posts;
+@router.get("/", response_model=List[schemas.Post])
+def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, search: str = ""):
+    posts = db.query(models.Post).filter(models.Post.title.contains(search)).limit(limit).offset(skip).all()
     return posts
 
 
