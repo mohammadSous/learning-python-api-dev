@@ -46,3 +46,9 @@ app.include_router(auth.router)
 # If they match, the password is correct
 
 # If both checks pass, create and return a JWT
+
+
+# How Voting and Likes System works:
+# logged in users should be able to like a post.
+# the user should be able to like a post once.
+# GET post should fetch the total number of likes.
