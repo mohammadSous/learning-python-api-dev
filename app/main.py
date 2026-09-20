@@ -52,3 +52,4 @@ app.include_router(auth.router)
 # logged in users should be able to like a post.
 # the user should be able to like a post once.
 # GET post should fetch the total number of likes.
+# in a relational DB, it's a many-to-many relationship  
