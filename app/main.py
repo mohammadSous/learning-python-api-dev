@@ -16,7 +16,7 @@ def root():
 
 
 # List of domains allowed to talk to your API
-origins = ["https://www.google.com"]
+origins = ["*"]
 
 # Attach the CORS middleware
 app.add_middleware(
