@@ -35,11 +35,19 @@ def get_posts(db: Session = Depends(get_db), limit: int = 10, skip: int = 0, sea
     return posts
 
 
-@router.get("/{id}", response_model= schemas.Post) #{id} = path parameter.
+@router.get("/{id}", response_model=schemas.PostOut)
 def get_post(id: int, db: Session = Depends(get_db)):
-    post = db.query(models.Post).filter(models.Post.id == id).first()
-    if not post: # clinet supplies an id, if it doesn't exist => error 404. (post not found)
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND, detail = f"post with id: {id} was not found")
+
+    # Run the query.
+    post = db.query(models.Post, func.count(models.Vote.post_id).label("votes")) \
+        .outerjoin(models.Vote, models.Vote.post_id == models.Post.id) \
+        .group_by(models.Post.id) \
+        .filter(models.Post.id == id).first() # <-- Don't forget .first()!
+
+    # Check if the post exist.
+    if not post: 
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"post with id: {id} was not found")
+    
     return post
 
 
