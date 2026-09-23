@@ -14,15 +14,15 @@ services:
       - postgres
 
   postgres:
-    image: postgres
-    environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_DB=fastapi_project
-      - POSTGRES_USER=postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - postgres-db:/var/lib/postgresql/data
+      image: postgres:15
+      environment:
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_DB=fastapi_project
+        - POSTGRES_USER=postgres
+      ports:
+        - "5432:5432" 
+      volumes:
+        - postgres-db:/var/lib/postgresql/data
 
 volumes:
   postgres-db:
