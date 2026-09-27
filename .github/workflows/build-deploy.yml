@@ -57,6 +57,9 @@ jobs:
           echo DATABASE_USERNAME=postgres >> $GITHUB_ENV
           echo DATABASE_PASSWORD=postgres >> $GITHUB_ENV
           echo DATABASE_NAME=fastapi_project_test >> $GITHUB_ENV
+          echo SECRET_KEY=testsecretkeyfortestingonly >> $GITHUB_ENV
+          echo ALGORITHM=HS256 >> $GITHUB_ENV
+          echo ACCESS_TOKEN_EXPIRE_MINUTES=30 >> $GITHUB_ENV
 
       - name: Run tests
         env:
@@ -65,4 +68,7 @@ jobs:
           DATABASE_USERNAME: ${{ env.DATABASE_USERNAME }}
           DATABASE_PASSWORD: ${{ env.DATABASE_PASSWORD }}
           DATABASE_NAME: ${{ env.DATABASE_NAME }}
+          SECRET_KEY: ${{ env.SECRET_KEY }}
+          ALGORITHM: ${{ env.ALGORITHM }}
+          ACCESS_TOKEN_EXPIRE_MINUTES: ${{ env.ACCESS_TOKEN_EXPIRE_MINUTES }}
         run: pytest
